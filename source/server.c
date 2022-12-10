@@ -25,7 +25,10 @@ int main()
 	clientLen = sizeof(clientSOCKaddr);
 	serverSOCKaddrPtr = (struct sockaddr*)&serverSOCKaddr;
 	clientSOCKaddrPtr = (struct sockaddr*)&clientSOCKaddr;
-
+	
+	
+	
+	// preparing to open server
 	serverFd = socket(AF_UNIX, SOCK_STREAM, DEFAULT_PROTOCOL);
 	serverSOCKaddr.sun_family = AF_UNIX;
 	strcpy(serverSOCKaddr.sun_path, "locker"); // server name
