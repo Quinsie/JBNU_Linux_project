@@ -16,14 +16,17 @@ int main()
 {
 	int clientFd, serverLen, result;
 	struct sockaddr_un serverSOCKaddr;
+	struct sockaddr* serverSOCKaddrPtr;
 
 	serverLen = sizeof(serverSOCKaddr);
+	serverSOCKaddrPtr = (struct sockaddr*)&serverSOCKaddr;
+
 	clientFd = socket(AF_UNIX, SOCK_STREAM, DEFAULT_PROTOCOL);
 	serverSOCKaddr.sun_family = AF_UNIX; // server domain
 	strcpy(serverSOCKaddr.sun_path, "locker"); // server name
 
 	do { // loop until get connection to server
-		result = connect(clientFd, &serverSOCKaddr, serverLen);
+		result = connect(clientFd, serverSOCKaddrPtr, serverLen);
 		if (result == -1) sleep(1); // wait and retry
 	} while (result == -1);
 
