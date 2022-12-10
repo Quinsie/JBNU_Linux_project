@@ -15,6 +15,7 @@
 int main()
 {
 	int serverFd, clientFd, serverLen, clientLen;
+	char recieve[MAXLINE];
 	struct sockaddr_un serverSOCKaddr, clientSOCKaddr;
 	struct sockaddr *serverSOCKaddrPtr, *clientSOCKaddrPtr;
 
@@ -37,8 +38,24 @@ int main()
 		printf("Server Called!\n");
 
 		if (fork() == 0) { // workspace
+			send_basic_info(clientFd); // introduce about this server
 			
-			send_basic_info(clientFd);
+			while (1) {
+				send_select(clientFd); // send select
+				readLine(clientFd, recieve);
+				
+				if (recieve[0] == '1') {
+					select_1(clientFd);
+				} else if (recieve[0] == '2') {
+					select_2(clientFd);
+				} else if (recieve[0] == '3') {
+					select_3(clientFd);
+				} else if (recieve[0] == '4') {
+					break;
+				} else {
+					select_4(clientFd);
+				}
+			}
 
 			close(clientFd); // close socket
 			exit(0);

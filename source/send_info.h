@@ -9,3 +9,9 @@
 #include <sys/stat.h>
 
 void send_basic_info(const int fd);
+void send_select(const int fd);
+
+void select_1(const int fd);
+void select_2(const int fd);
+void select_3(const int fd);
+void select_4(const int fd);
