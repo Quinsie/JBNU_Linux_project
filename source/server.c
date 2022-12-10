@@ -36,11 +36,13 @@ int main()
 		clientFd = accept(serverFd, clientSOCKaddrPtr, &clientLen); // accept client connect
 		printf("Server Called!\n");
 
-		if (fork() == 0) {
-			/* workspace */
+		if (fork() == 0) { // workspace
+			
+			send_basic_info(clientFd);
+
 			close(clientFd); // close socket
 			exit(0);
-		} else close(clientFd);
+		} else close(clientFd); // close socket
 	}
 
 	exit(0);

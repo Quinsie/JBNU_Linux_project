@@ -15,6 +15,7 @@
 int main()
 {
 	int clientFd, serverLen, result;
+	char msg[MAXLINE];
 	struct sockaddr_un serverSOCKaddr;
 	struct sockaddr* serverSOCKaddrPtr;
 
@@ -30,7 +31,8 @@ int main()
 		if (result == -1) sleep(1); // wait and retry
 	} while (result == -1);
 
-	/* workspace */
+	readLine(clientFd, msg);
+	printf("%s\n", msg);
 
 	close(clientFd);
 
