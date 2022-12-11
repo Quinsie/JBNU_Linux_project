@@ -8,7 +8,7 @@ void send_basic_info(const int fd)
 
 void send_select(const int fd)
 {
-	char str[] = "Please select:\nCheck locker status : 1\nLoad cargo : 2\nTake cargo: 3\nExit : Press any key\nYour select : ";
+	char str[] = "Check locker status : 1\nLoad cargo : 2\nTake cargo: 3\nExit : 4\nYour select : ";
 	write(fd, str, sizeof(str));
 }
 

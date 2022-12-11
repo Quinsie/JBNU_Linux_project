@@ -26,7 +26,7 @@ int main()
 	serverSOCKaddrPtr = (struct sockaddr*)&serverSOCKaddr;
 	clientSOCKaddrPtr = (struct sockaddr*)&clientSOCKaddr;
 	
-	
+	base_helper();
 	
 	// preparing to open server
 	serverFd = socket(AF_UNIX, SOCK_STREAM, DEFAULT_PROTOCOL);
