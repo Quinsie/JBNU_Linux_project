@@ -10,7 +10,7 @@
 #include <sys/un.h>
 
 #define DEFAULT_PROTOCOL 0
-#define MAXLINE 100
+#define MAXLINE 10000
 
 int main()
 {
@@ -24,7 +24,7 @@ int main()
 
 	clientFd = socket(AF_UNIX, SOCK_STREAM, DEFAULT_PROTOCOL);
 	serverSOCKaddr.sun_family = AF_UNIX; // server domain
-	strcpy(serverSOCKaddr.sun_path, "locker"); // server name
+	strcpy(serverSOCKaddr.sun_path, "../resource/locker"); // server name
 
 	do { // loop until get connection to server
 		result = connect(clientFd, serverSOCKaddrPtr, serverLen);

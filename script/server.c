@@ -10,12 +10,13 @@
 #include <sys/un.h>
 
 #define DEFAULT_PROTOCOL 0
-#define MAXLINE 100
+#define MAXLINE 10000
 
 int main()
 {
 	int serverFd, clientFd, serverLen, clientLen;
 	int lockerlen;
+	int* lockerstatus;
 	char recieve[MAXLINE];
 	struct sockaddr_un serverSOCKaddr, clientSOCKaddr;
 	struct sockaddr *serverSOCKaddrPtr, *clientSOCKaddrPtr;
@@ -27,13 +28,13 @@ int main()
 	serverSOCKaddrPtr = (struct sockaddr*)&serverSOCKaddr;
 	clientSOCKaddrPtr = (struct sockaddr*)&clientSOCKaddr;
 	
-	base_helper(lockerlen);
+	base_helper(&lockerlen, &lockerstatus); // initialize locker
 	
 	// preparing to open server
 	serverFd = socket(AF_UNIX, SOCK_STREAM, DEFAULT_PROTOCOL);
 	serverSOCKaddr.sun_family = AF_UNIX;
-	strcpy(serverSOCKaddr.sun_path, "locker"); // server name
-	unlink("locker"); // if file already exists, remove
+	strcpy(serverSOCKaddr.sun_path, "../resource/locker"); // server name
+	unlink("../resource/locker"); // if file already exists, remove
 	bind(serverFd, serverSOCKaddrPtr, serverLen); // make server file
 	listen(serverFd, 5); // server queue, normally set to 5.
 
@@ -45,26 +46,18 @@ int main()
 			send_basic_info(clientFd); // introduce about this server
 			
 			while (1) {
-				send_select(clientFd); // send select
+				send_select(clientFd); // send selection
 				readLine(clientFd, recieve);
-				
-				if (recieve[0] == '1') {
-					select_1(clientFd);
-				} else if (recieve[0] == '2') {
-					select_2(clientFd);
-				} else if (recieve[0] == '3') {
-					select_3(clientFd);
-				} else if (recieve[0] == '4') {
-					break;
-				} else {
-					select_4(clientFd);
-				}
+				if (menu(clientFd, recieve[0], lockerlen, lockerstatus)) break;
 			}
 
 			close(clientFd); // close socket
 			exit(0);
 		} else close(clientFd); // close socket
+		
 	}
+	
+	free(lockerstatus); // free assign
 
 	exit(0);
 }

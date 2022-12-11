@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <signal.h>
@@ -9,4 +10,8 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-void base_helper(int lockerlen);
+#define MAXLINE 10000
+#define MAXSUBLINE 100
+
+void base_helper(int* lockerlen, int** lockerstatus);
+int menu(const int fd, const char order, const int lockerlen, int* lockerstatus);

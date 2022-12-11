@@ -9,6 +9,6 @@
 #include <sys/stat.h>
 
 #define DEFAULT_PROTOCOL 0
-#define MAXLINE 100
+#define MAXLINE 10000
 
 int readLine(int fd, char* str);
