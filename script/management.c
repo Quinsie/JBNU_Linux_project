@@ -54,13 +54,7 @@ int menu(const int fd, const char order, const int lockerlen, int* lockerstatus)
 			strcat(str, st);
 		}
 		
-		write(fd, str, strlen(str) + 1);
-		
-		
-		//char str2[] = "You selected 1.\n";
-		//printf("Client selected 1.\n");
-		//write(fd, str2, strlen(str2) + 1);
-		
+		write(fd, str, strlen(str) + 1);		
 		
 	} else if (order == '2') { // load
 		char str[] = "You selected 2.\n";
