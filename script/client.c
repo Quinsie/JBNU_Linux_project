@@ -15,7 +15,7 @@
 int main()
 {
 	int clientFd, serverLen, result;
-	char inmsg[MAXLINE], outmsg[MAXLINE];
+	char msg[MAXLINE];
 	struct sockaddr_un serverSOCKaddr;
 	struct sockaddr* serverSOCKaddrPtr;
 
@@ -31,24 +31,10 @@ int main()
 		if (result == -1) sleep(1); // wait and retry
 	} while (result == -1);
 
-	readLine(clientFd, inmsg); // recieve basic info about server
-	printf("%s", inmsg);
+	readLine(clientFd, msg); // recieve basic info about server
+	printf("%s", msg);
 	
-	while (1) {
-		readLine(clientFd, inmsg); // recieve selection info
-		printf("\n%s", inmsg);
-		fgets(outmsg, MAXLINE, stdin); // input selection
-		
-		if (outmsg[0] == '4') {
-			printf("\nClient Terminates.\n");
-			break;
-		}
-		
-		write(clientFd, outmsg, strlen(outmsg) + 1); // send
-		
-		readLine(clientFd, inmsg);
-		printf("\n%s", inmsg);
-	}
+	while (1) if (client_menu(clientFd)) break;
 
 	close(clientFd);
 

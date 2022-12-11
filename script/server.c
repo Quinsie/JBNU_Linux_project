@@ -57,7 +57,7 @@ int main()
 		
 	}
 	
-	free(*lockerstatus); // free assign
+	free(lockerstatus); // free assign
 
 	exit(0);
 }
