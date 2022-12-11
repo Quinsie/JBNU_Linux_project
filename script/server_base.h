@@ -9,8 +9,4 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-void base_helper()
-{
-	printf("Server has opened.\n");
-	
-}
+void base_helper(int lockerlen);

@@ -15,6 +15,7 @@
 int main()
 {
 	int serverFd, clientFd, serverLen, clientLen;
+	int lockerlen;
 	char recieve[MAXLINE];
 	struct sockaddr_un serverSOCKaddr, clientSOCKaddr;
 	struct sockaddr *serverSOCKaddrPtr, *clientSOCKaddrPtr;
@@ -26,7 +27,7 @@ int main()
 	serverSOCKaddrPtr = (struct sockaddr*)&serverSOCKaddr;
 	clientSOCKaddrPtr = (struct sockaddr*)&clientSOCKaddr;
 	
-	base_helper();
+	base_helper(lockerlen);
 	
 	// preparing to open server
 	serverFd = socket(AF_UNIX, SOCK_STREAM, DEFAULT_PROTOCOL);
