@@ -42,7 +42,6 @@ int main()
 
 	while (1) {
 		clientFd = accept(serverFd, clientSOCKaddrPtr, &clientLen); // accept client connect
-		printf("Server Called!\n");
 
 		if (fork() == 0) { // workspace
 			basic_info(clientFd); // introduce server			

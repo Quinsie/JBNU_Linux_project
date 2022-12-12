@@ -67,6 +67,7 @@ void store(const int clientFd, const int lockerlen)
 	lseek(fd, (long)(inum - 1) * sizeof(chtemp), SEEK_SET);
 	read(fd, &chtemp, sizeof(chtemp));
 	
+	// fill unfill check
 	if (chtemp == '1') {
 		char tmp[] = "1";
 		write(clientFd, tmp, strlen(tmp) + 1);
@@ -188,10 +189,10 @@ void client_store(const int clientFd)
 		} else break;
 	}
 	
-	// lockmsg
+	// lockmsg (fill unfill check)
 	readLine(clientFd, str);
 	if (str[0] == '1') {
-		printf("Sorry, this locker has been filled just ago. Please try again.\n");
+		printf("\nSorry, this locker has been filled just ago. Please try again.\n");
 		printf("Return to menu...\n\n");
 		sleep(1);
 		return;

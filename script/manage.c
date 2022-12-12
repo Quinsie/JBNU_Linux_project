@@ -62,6 +62,7 @@ void manage(const int clientFd, const int lockerlen)
 	lseek(fd, (long)(inum - 1) * sizeof(chtemp), SEEK_SET);
 	read(fd, &chtemp, sizeof(chtemp));
 	
+	// fill unfill check
 	if (chtemp == '0') {
 		char tmp[] = "0";
 		write(clientFd, tmp, strlen(tmp) + 1);
@@ -111,6 +112,8 @@ void manage(const int clientFd, const int lockerlen)
 	
 	memset(str, 0, sizeof(str));
 	if (!flag2) { // wrong 3 times
+		printf("Someone tried to access LOCKER %d with 3 times failed.\n", inum); // server
+		
 		strcat(str, "\nYou have typed wrong answer 3 times. Access denied.\n");
 		write(clientFd, str, strlen(str) + 1);
 		lock.l_type = F_UNLCK;
@@ -272,9 +275,10 @@ void client_manage(const int clientFd)
 		}
 	}
 	
+	// fill unfill check
 	readLine(clientFd, str);
 	if (str[0] == '0') {
-		printf("Sorry, this locker has been empty just ago. Please try again.\n");
+		printf("\nSorry, this locker has been empty just ago. Please try again.\n");
 		printf("Return to menu...\n\n");
 		sleep(1);
 		return;
