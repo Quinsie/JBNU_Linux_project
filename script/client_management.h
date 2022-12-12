@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <signal.h>
@@ -13,4 +12,4 @@
 #define MAXLINE 10000
 #define MAXSUBLINE 100
 
-int client_menu(const int fd);
+int menu(int clientFd);

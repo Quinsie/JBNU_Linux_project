@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <signal.h>
@@ -11,6 +12,7 @@
 
 #define DEFAULT_PROTOCOL 0
 #define MAXLINE 10000
+#define MAXSUBLINE 100
 
 int main()
 {
@@ -31,10 +33,10 @@ int main()
 		if (result == -1) sleep(1); // wait and retry
 	} while (result == -1);
 
-	readLine(clientFd, msg); // recieve basic info about server
+	readLine(clientFd, msg);
 	printf("%s", msg);
 	
-	while (1) if (client_menu(clientFd)) break;
+	while (1) if (menu(clientFd)) break;
 
 	close(clientFd);
 

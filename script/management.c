@@ -1,148 +1,65 @@
 #include "management.h"
-#include "locker.h"
 
-void base_helper(int* lockerlen, int** lockerstatus)
+void server_on(int* lockerlen)
 {
-	int num, record;
-	// int number, big, mid, small;
+	int num, lockerstatus, recordFd;
 	
-	printf("Server has opened.\n");
-	record = open("../resource/record", O_WRONLY|O_CREAT|O_TRUNC, 0640); // make locker file
-	
-	printf("Please type total size of locker : ");
+	fprintf(stderr, "Prepare to open locker server.\n");
+	fprintf(stderr, "Please type total size of locker : ");
 	scanf("%d", &num);
 	*lockerlen = num;
-	//number = lockerlen;
 	
-	*lockerstatus = (int*)calloc(*lockerlen, sizeof(int)); // initialize status of locker
-	printf("Locker has initialized with size of %d.\n", *lockerlen);
-	
-	
-	/*
-	while (1) {
-		printf("Please type the number of big size locker. It must be less than %d.\nInput : ", number);
-		scanf("%d", &big);
-		
-		if (big > number) {
-			printf("Input error. Please type again.\n");
-			continue;
-		}
-		
-		number -= big;
+	lockerstatus = open("../resource/status", O_RDWR|O_CREAT, 0640); // make locker status file
+	lseek(lockerstatus, 0, SEEK_SET);
+	for (int i = 0; i < num; i++) {
+		char chtemp = '0';
+		write(lockerstatus, &chtemp, sizeof(char));
 	}
-	*/
+	fprintf(stderr, "Locker has been initialized with size of %d.\n", num);
 	
-	close(record);
+	recordFd = open("../resource/record", O_RDWR|O_CREAT, 0640); // make record file
+	
+	close(lockerstatus);
+	close(recordFd);
 }
 
-int menu(const int fd, const char order, const int lockerlen, int* lockerstatus)
+void basic_info(const int fd) // introduce server to client
 {
-	if (order == '1') { // check
-		char str[MAXLINE] = "** LOCKER STATUS **\n";
-		
-		for (int i = 0; i < lockerlen; i++) {
-			char st[MAXSUBLINE] = "LOCKER "; char num[5];
-			
-			sprintf(num, "%d", i + 1);
-			strcat(st, num);
-			if (lockerstatus[i]) strcat(st, " : IN USE\n");
-			else strcat(st, " : VOID\n");
-			strcat(str, st);
-		}
-		
-		write(fd, str, strlen(str) + 1);		
-		
-	} else if (order == '2') { // load
-		char str[MAXLINE] = "** LOAD CARGO **\nYou can load your cargo on this tab.\n\nVOID lockers are here : \n";
-		char recv[MAXSUBLINE], chtemp[MAXSUBLINE];
-		int num, record_fd;
-		struct locker record;
-		
-		for (int i = 0; i < lockerlen; i++) {
-			char num[5];
-			if (!lockerstatus[i]) {
-				sprintf(num, "%d ", i + 1);
-				strcat(str, num);
-			}	
-		}
-		
-		write(fd, str, strlen(str) + 1); // send selection
-		memset(str, 0, sizeof(str));
-		strcat(str, "\nSelect a locker number where you want to load your cargo.\nYour input >> ");
-		
-		while (1) {
-			write(fd, str, strlen(str) + 1); // send order
-			readLine(fd, recv); // recieve client's answer
-			num = atoi(recv);
-			
-			if (num > lockerlen || num <= 0) {
-				char tmp[] = "1";
-				write(fd, tmp, strlen(tmp) + 1);
-				continue;
-			} else if (lockerstatus[num - 1]) { // in use
-				char tmp[] = "1";
-				write(fd, tmp, strlen(tmp) + 1);
-				continue;
-			} else { // void
-				char tmp[] = "0";
-				write(fd, tmp, strlen(tmp) + 1);
-				break;
-			}
-		}
-		
-		memset(str, 0, sizeof(str));
-		strcat(str, "\nPlease type your cargo's name.\nYour input >> ");
-		write(fd, str, strlen(str) + 1);
-		
-		readLine(fd, recv); // recieve cargo name
-		recv[strlen(recv) - 1] = '\0';
-		strncpy(record.name, recv, strlen(recv));
-		fprintf(stderr, "%s %d\n", record.name, strlen(record.name));
-		/*
-		memset(str, 0, sizeof(str));
-		strcpy(str, "\nLocker Password : ");
-		write(fd, str, strlen(str + 1));
-		
-		sleep(1);
-		readLine(fd, recv); // recieve password
-		recv[strlen(recv) - 1] = '\0';
-		strncpy(record.passwd, recv, strlen(recv));
-		//fprintf(stderr, "%s %d\n", record.passwd, strlen(record.passwd));
+	char str[MAXLINE] = "";
+	
+	for (int i = 0; i < 50; i++) strcat(str, "=");
+	strcat(str, "\n");
+	strcat(str, "Welcome to locker server!\n");
+	strcat(str, "You can store or take your cargo on this server.\n");
+	for (int i = 0; i < 50; i++) strcat(str, "=");
+	strcat(str, "\n");
+	write(fd, str, strlen(str) + 1);
+}
 
-		memset(str, 0, sizeof(str));
-		strcat(str, "\nType your password again : ");
-		write(fd, str, strlen(str + 1));
-		
-		sleep(1);
-		readLine(fd, recv); // recieve again password
-		recv[strlen(recv) - 1] = '\0';
-		strncpy(chtemp, recv, strlen(recv));
-		if (chtemp == record.passwd) { // correct
-			char tmp[] = "1";
-			write(fd, tmp, strlen(tmp) + 1);
-		} else { // wrong
-			char tmp[] = "0";
-			write(fd, tmp, strlen(tmp) + 1);
-			return 0;
-		}
-		
-		record_fd = open("../resource/record", O_RDWR);
-		lseek(record_fd, (long)(num - BASE_NUM) * sizeof(record), SEEK_SET);
-		write(record_fd, &record, sizeof(record));
-		close(record_fd);
-		lockerstatus[num - BASE_NUM] = 1;
-*/
-	} else if (order == '3') { // check or take cargo
-		char str[] = "You selected 3.\n";
-		printf("Client selected 3.\n");
-		write(fd, str, strlen(str) + 1);
-		
-	} else if (order == '4') { // terminate
+int selection(const int clientFd, const int lockerlen) // view menu
+{
+	char msg[MAXSUBLINE], str[MAXLINE] = "";
+	
+	strcat(str, "\n** MENU **\nCheck locker status : 1\nStore your cargo : 2\nManage your cargo : 3\nExit : 4\nYour select >> ");
+	write(clientFd, str, strlen(str) + 1);
+	
+	readLine(clientFd, msg);
+	
+	if (msg[0] == '1') check(clientFd, lockerlen); // check
+	else if (msg[0] == '2') store(clientFd, lockerlen); // store
+	else if (msg[0] == '3') { // manage
+		char tmp[] = "\nYour selection was 3.\n";
+		write(clientFd, tmp, strlen(tmp) + 1);
+	} else if (msg[0] == '4') { // terminate
+		char tmp[] = "\nClient terminates.\n";
+		write(clientFd, tmp, strlen(tmp) + 1);
 		return 1;
 	} else {
-		char str[] = "Invaild input. Please type again.\n";
-		write(fd, str, strlen(str) + 1);
+		char tmp[] = "\nWrong selection.\n";
+		write(clientFd, tmp, strlen(tmp) + 1);
 	}
 	
 	return 0;
 }
+
+

@@ -8,10 +8,11 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include "locker.h"
 
 #define MAXLINE 10000
 #define MAXSUBLINE 100
 
-void server_on(int* lockerlen);
-void basic_info(const int fd);
-int selection(const int clientFd, const int lockerlen);
+void store(const int clientFd, const int lockerlen);
+void client_store(const int clientFd);
+

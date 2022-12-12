@@ -12,6 +12,5 @@
 #define MAXLINE 10000
 #define MAXSUBLINE 100
 
-void server_on(int* lockerlen);
-void basic_info(const int fd);
-int selection(const int clientFd, const int lockerlen);
+void check(const int clientFd, const int lockerlen);
+void client_check(const int clientFd);
