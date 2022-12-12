@@ -1,5 +1,6 @@
 #include "management.h"
 
+// server base setting
 void server_on(int* lockerlen)
 {
 	int num, lockerstatus, recordFd;
@@ -11,7 +12,7 @@ void server_on(int* lockerlen)
 	
 	lockerstatus = open("../resource/status", O_RDWR|O_CREAT, 0640); // make locker status file
 	lseek(lockerstatus, 0, SEEK_SET);
-	for (int i = 0; i < num; i++) {
+	for (int i = 0; i < num; i++) { // save lockerstatus via binary file
 		char chtemp = '0';
 		write(lockerstatus, &chtemp, sizeof(char));
 	}
@@ -55,7 +56,7 @@ int selection(const int clientFd, const int lockerlen) // view menu
 	strcat(str, "\n** MENU **\nCheck locker status : 1\nStore your cargo : 2\nManage your cargo : 3\nExit : 4\nYour select >> ");
 	write(clientFd, str, strlen(str) + 1);
 	
-	readLine(clientFd, msg);
+	readLine(clientFd, msg); // recieve client's order (select menu)
 	
 	if (msg[0] == '1') check(clientFd, lockerlen); // check
 	else if (msg[0] == '2') store(clientFd, lockerlen); // store
@@ -65,5 +66,3 @@ int selection(const int clientFd, const int lockerlen) // view menu
 	
 	return 0;
 }
-
-
