@@ -37,6 +37,7 @@ int main()
 	bind(serverFd, serverSOCKaddrPtr, serverLen); // make server file
 	listen(serverFd, 5); // server queue, normally set to 5.
 	
+	// server initialize
 	server_on(&lockerlen);
 
 	while (1) {
