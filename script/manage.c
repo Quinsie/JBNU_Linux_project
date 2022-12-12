@@ -52,12 +52,28 @@ void manage(const int clientFd, const int lockerlen)
 	// get locker data from record
 	recordFd = open("../resource/record", O_RDWR);
 	
+	// record lock
 	lock.l_type = F_WRLCK;
 	lock.l_whence = SEEK_SET;
 	lock.l_start = (inum - 1) * sizeof(record);
 	lock.l_len = sizeof(record);
 	fcntl(recordFd, F_SETLKW, &lock);
 	
+	lseek(fd, (long)(inum - 1) * sizeof(chtemp), SEEK_SET);
+	read(fd, &chtemp, sizeof(chtemp));
+	
+	if (chtemp == '0') {
+		char tmp[] = "0";
+		write(clientFd, tmp, strlen(tmp) + 1);
+		free(lockerstatus);
+		close(fd);
+		close(recordFd);
+		return;
+	} else {
+		char tmp[] = "1";
+		write(clientFd, tmp, strlen(tmp) + 1);
+	}
+
 	lseek(recordFd, (long)(inum - 1) * sizeof(record), SEEK_SET);
 	read(recordFd, &record, sizeof(record));
 	
@@ -254,6 +270,14 @@ void client_manage(const int clientFd)
 			printf("This number is unavailable. Please retry.\n\n");
 			sleep(1);
 		}
+	}
+	
+	readLine(clientFd, str);
+	if (str[0] == '0') {
+		printf("Sorry, this locker has been empty just ago. Please try again.\n");
+		printf("Return to menu...\n\n");
+		sleep(1);
+		return;
 	}
 	
 	// password

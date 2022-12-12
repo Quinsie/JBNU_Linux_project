@@ -64,6 +64,21 @@ void store(const int clientFd, const int lockerlen)
 	lock.l_len = sizeof(record);
 	fcntl(recordFd, F_SETLKW, &lock);
 	
+	lseek(fd, (long)(inum - 1) * sizeof(chtemp), SEEK_SET);
+	read(fd, &chtemp, sizeof(chtemp));
+	
+	if (chtemp == '1') {
+		char tmp[] = "1";
+		write(clientFd, tmp, strlen(tmp) + 1);
+		free(voidlocker);
+		close(fd);
+		close(recordFd);
+		return;
+	} else {
+		char tmp[] = "0";
+		write(clientFd, tmp, strlen(tmp) + 1);
+	}
+	
 	lseek(recordFd, (long)(inum - 1) * sizeof(record), SEEK_SET);
 	
 	// cargo name
@@ -171,6 +186,15 @@ void client_store(const int clientFd)
 			printf("This number is unavailable. Please retry.\n\n");
 			sleep(1);
 		} else break;
+	}
+	
+	// lockmsg
+	readLine(clientFd, str);
+	if (str[0] == '1') {
+		printf("Sorry, this locker has been filled just ago. Please try again.\n");
+		printf("Return to menu...\n\n");
+		sleep(1);
+		return;
 	}
 	
 	// cargo's name
