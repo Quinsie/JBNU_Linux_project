@@ -65,11 +65,9 @@
 * store.c, store.h : 사물함에 물건을 보관하기 위한 소스파일
 
 #### 컴파일
-* 서버 : gcc -o server server.c check.c manage.c management.c readline.c store.c
-* 클라이언트 : gcc -o client client.c check.c client_management.c manage.c readline.c store.c
-* 프로그램 실행 : 서버 선 실행 -> ./server 후 클라이언트 실행 -> ./client
-
-
+* 서버 : source 디렉토리 안에서 gcc -o ../exec/server server.c check.c manage.c management.c readline.c store.c
+* 클라이언트 : source gcc -o ../exec/client client.c check.c client_management.c manage.c readline.c store.c
+* 프로그램 실행 : exec 디렉토리 안에서 서버 선 실행 -> ./server 후 클라이언트 실행 -> ./client
 
 ***
 
