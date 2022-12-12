@@ -33,10 +33,10 @@ int main()
 		if (result == -1) sleep(1); // wait and retry
 	} while (result == -1);
 
-	readLine(clientFd, msg);
+	readLine(clientFd, msg); // recieve server basic information
 	printf("%s", msg);
 	
-	while (1) if (menu(clientFd)) break;
+	while (1) if (menu(clientFd)) break; // client_managment
 
 	close(clientFd);
 
