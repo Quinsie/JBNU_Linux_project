@@ -49,6 +49,24 @@
 #### 특징
 * 서버가 재실행 될 때마다 사물함 정보가 초기화된다. (서버 실행과 동시에 생성할 사물함 개수를 서버 콘솔로 입력받는다.)
 
+#### 소스파일 설명
+* check.c, check.h : 서버 사물함이 사용중인지 아닌지 판단하는 소스파일
+* client.c : 서버에 연결하기 위한 클라이언트 소스파일
+* client_management.c, client_management.h : 클라이언트가 수행하는 역할이 수록된 소스파일
+* locker.h : 사물함 구조체가 선언된 헤더파일
+* manage.c, manage.h : 서버 사물함을 관리하기 위한 소스파일
+* management.c, management.h : 서버가 수행하는 역할이 수록된 소스파일
+* readline.c, readline.h : 소켓 파일 디스크립터에서 한 줄의 문장을 읽어오는 코드가 수록된 소스파일
+* server.c : 클라이언트의 연결을 받기 위한 서버를 여는 소스파일
+* store.c, store.h : 사물함에 물건을 보관하기 위한 소스파일
+
+#### 컴파일
+* 서버 : gcc -o server server.c check.c manage.c management.c readline.c store.c
+* 클라이언트 : gcc -o client client.c check.c client_management.c manage.c readline.c store.c
+* 프로그램 실행 : 서버 선 실행 -> ./server 후 클라이언트 실행 -> ./client
+
+
+
 ***
 
 ### 22-12-07 (수)
