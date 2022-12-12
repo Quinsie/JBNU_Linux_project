@@ -7,34 +7,34 @@ void manage(const int clientFd, const int lockerlen)
 	int* lockerstatus;
 	struct locker record;
 	
-	fd = open("../resource/status", O_RDWR);
+	fd = open("../resource/status", O_RDWR); // lockerstatus file descriptor (option = read ans write)
 	lseek(fd, 0, SEEK_SET);
-	lockerstatus = (int*)calloc(lockerlen, sizeof(int));
+	lockerstatus = (int*)calloc(lockerlen, sizeof(int)); // declaration and initialize
 	
 	for (int i = 0; i < lockerlen; i++) {
-		read(fd, &chtemp, sizeof(chtemp));
-		if (chtemp == '1') lockerstatus[i] = 1;
+		read(fd, &chtemp, sizeof(chtemp)); // read info from lockerstatus file
+		if (chtemp == '1') lockerstatus[i] = 1; // if '1' in lockerstatus file, set now index is on. (flag table)
 	}
 	
 	strcat(str, "\n\n** MANAGE CARGO **\n");
 	strcat(str, "You can manage stored cargo on this server.\n\n");
-	write(clientFd, str, strlen(str) + 1);
+	write(clientFd, str, strlen(str) + 1); // send basic information about this option
 	memset(str, 0, sizeof(str));
 	
 	strcat(str, "Press your locker's number. If press 0, you will return to menu.\n");
-	strcat(str, "Your input >> ");
+	strcat(str, "Your input >> "); // get client's answer
 	
 	while (1) {
 		write(clientFd, str, strlen(str) + 1); // send selection
-		readLine(clientFd, recvmsg);
+		readLine(clientFd, recvmsg); // get client's answer
 		
-		inum = atoi(recvmsg);
+		inum = atoi(recvmsg); // inum = target index
 		if (inum > lockerlen || inum < 0) { // out of order
-			char tmp[] = "2";
+			char tmp[] = "2"; // send error code
 			write(clientFd, tmp, strlen(tmp) + 1);
 			continue;
 		} else if (inum == 0) { // go to menu
-			free(lockerstatus);
+			free(lockerstatus); // deallocation (needed)
 			close(fd);
 			return;
 		} else if (lockerstatus[inum - 1]) { // in use
@@ -42,7 +42,7 @@ void manage(const int clientFd, const int lockerlen)
 			write(clientFd, tmp, strlen(tmp) + 1);
 			break;
 		} else { // void
-			char tmp[] = "0";
+			char tmp[] = "0"; // send serror code
 			write(clientFd, tmp, strlen(tmp) + 1);
 			continue;
 		}
@@ -78,8 +78,8 @@ void manage(const int clientFd, const int lockerlen)
 			char tmp[] = "1";
 			write(clientFd, tmp, strlen(tmp) + 1);
 			break;
-		} else {
-			if (!repeat) flag2 = 0;
+		} else { // incorrect
+			if (!repeat) flag2 = 0; // if it was last chance, turn off flag2
 			char tmp[] = "0";
 			write(clientFd, tmp, strlen(tmp) + 1);
 		}
@@ -106,7 +106,7 @@ void manage(const int clientFd, const int lockerlen)
 	strcat(str, "\n\nTake cargo : 1\nModify cargo : 2\nChange password : 3\nExit : 4\nYour input >> ");
 	write(clientFd, str, strlen(str) + 1);
 	
-	readLine(clientFd, recvmsg);
+	readLine(clientFd, recvmsg); // recieve client's answer
 	if (recvmsg[0] == '1') { // take
 		// remove data on record
 		memset(record.name, 0, sizeof(record.name));
@@ -167,6 +167,7 @@ void manage(const int clientFd, const int lockerlen)
 			}
 		}
 		
+		// check if it is same
 		flag = 1;
 		for (int i = 0; i < 100; i++) {
 			if (recvmsg[i] != recvmsg2[i]) { flag = 0; break; }
@@ -191,7 +192,7 @@ void manage(const int clientFd, const int lockerlen)
 		strcpy(record.passwd, recvmsg);
 		
 		lseek(recordFd, (long)(inum - 1) * sizeof(record), SEEK_SET);
-		write(recordFd, &record, sizeof(record));
+		write(recordFd, &record, sizeof(record)); // write on record file
 		
 	} else if (recvmsg[0] == '4') { // exit
 		char tmplst[] = "\nNothing changed.\n";
@@ -230,12 +231,12 @@ void client_manage(const int clientFd)
 		memset(sendmsg, 0, sizeof(sendmsg));
 		
 		readLine(clientFd, str);
-		if (str[0] == '0') {
-			printf("This locker has nothing! Please retry.\n\n");
+		if (str[0] == '0') { // void
+			printf("This locker is clean! Please retry with other number.\n\n");
 			sleep(1);
-		} else if (str[0] == '1') {
+		} else if (str[0] == '1') { // in use
 			break;
-		} else {
+		} else { // error
 			printf("This number is unavailable. Please retry.\n\n");
 			sleep(1);
 		}
