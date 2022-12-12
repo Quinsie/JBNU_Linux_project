@@ -12,4 +12,6 @@
 #define MAXLINE 10000
 #define MAXSUBLINE 100
 
+void client_terminate(int clientFd);
+void client_wrong(int clientFd);
 int menu(int clientFd);

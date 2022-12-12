@@ -22,7 +22,7 @@ void store(const int clientFd, const int lockerlen)
 			strcat(str, " ");
 		} else voidlocker[i] = 1;
 	}
-	strcat(str, "\n\n"); // check completed (debug)
+	strcat(str, "\n\n");
 	
 	write(clientFd, str, strlen(str) + 1);
 	memset(str, 0, sizeof(str));

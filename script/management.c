@@ -36,6 +36,18 @@ void basic_info(const int fd) // introduce server to client
 	write(fd, str, strlen(str) + 1);
 }
 
+void terminate(const int clientFd)
+{
+	char tmp[] = "\nClient terminates.\n";
+	write(clientFd, tmp, strlen(tmp) + 1);
+}
+
+void wrong(const int clientFd)
+{
+	char tmp[] = "\nWrong selection.\n";
+	write(clientFd, tmp, strlen(tmp) + 1);
+}
+
 int selection(const int clientFd, const int lockerlen) // view menu
 {
 	char msg[MAXSUBLINE], str[MAXLINE] = "";
@@ -47,17 +59,9 @@ int selection(const int clientFd, const int lockerlen) // view menu
 	
 	if (msg[0] == '1') check(clientFd, lockerlen); // check
 	else if (msg[0] == '2') store(clientFd, lockerlen); // store
-	else if (msg[0] == '3') { // manage
-		char tmp[] = "\nYour selection was 3.\n";
-		write(clientFd, tmp, strlen(tmp) + 1);
-	} else if (msg[0] == '4') { // terminate
-		char tmp[] = "\nClient terminates.\n";
-		write(clientFd, tmp, strlen(tmp) + 1);
-		return 1;
-	} else {
-		char tmp[] = "\nWrong selection.\n";
-		write(clientFd, tmp, strlen(tmp) + 1);
-	}
+	else if (msg[0] == '3') manage(clientFd, lockerlen); // manage
+	else if (msg[0] == '4') { terminate(clientFd); return 1; } // terminate
+	else wrong(clientFd); // wrong input
 	
 	return 0;
 }

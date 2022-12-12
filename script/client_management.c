@@ -1,5 +1,19 @@
 #include "client_management.h"
 
+void client_terminate(int clientFd)
+{
+	char inmsg[MAXLINE];
+	readLine(clientFd, inmsg);
+	printf("%s", inmsg);
+}
+
+void client_wrong(int clientFd)
+{
+	char inmsg[MAXLINE];
+	readLine(clientFd, inmsg);
+	printf("%s", inmsg);
+}
+
 int menu(int clientFd)
 {
 	char inmsg[MAXLINE], outmsg[MAXLINE];
@@ -13,17 +27,9 @@ int menu(int clientFd)
 	
 	if (outmsg[0] == '1') client_check(clientFd); // check
 	else if (outmsg[0] == '2') client_store(clientFd); // store
-	else if (outmsg[0] == '3') { // management
-		readLine(clientFd, inmsg);
-		printf("%s", inmsg);
-	} else if (outmsg[0] == '4') { // terminate
-		readLine(clientFd, inmsg);
-		printf("%s", inmsg);
-		return 1;
-	} else {
-		readLine(clientFd, inmsg);
-		printf("%s", inmsg);
-	}
+	else if (outmsg[0] == '3') client_manage(clientFd); // manage
+	else if (outmsg[0] == '4') { client_terminate(clientFd); return 1; }
+	else client_wrong(clientFd);
 	
 	return 0;
 }
