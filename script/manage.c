@@ -16,7 +16,7 @@ void manage(const int clientFd, const int lockerlen)
 		if (chtemp == '1') lockerstatus[i] = 1;
 	}
 	
-	strcat(str, "\n** MANAGE CARGO **\n");
+	strcat(str, "\n\n** MANAGE CARGO **\n");
 	strcat(str, "You can manage stored cargo on this server.\n\n");
 	write(clientFd, str, strlen(str) + 1);
 	memset(str, 0, sizeof(str));
@@ -97,7 +97,7 @@ void manage(const int clientFd, const int lockerlen)
 	
 	// give locker info and get order
 	sprintf(num, "%d", inum);
-	strcat(str, "\n** Locker ");
+	strcat(str, "\n\n** Locker ");
 	strcat(str, num);
 	strcat(str, " info **\nCargo name = ");
 	strcat(str, record.name);
@@ -108,11 +108,102 @@ void manage(const int clientFd, const int lockerlen)
 	
 	readLine(clientFd, recvmsg);
 	if (recvmsg[0] == '1') { // take
+		// remove data on record
+		memset(record.name, 0, sizeof(record.name));
+		memset(record.passwd, 0, sizeof(record.passwd));
+		lseek(recordFd, (long)(inum - 1) * sizeof(record), SEEK_SET);
+		write(recordFd, &record, sizeof(record));
+		
+		// remove data on lockerstatus
+		chtemp = '0';
+		lseek(fd, (long)(inum - 1) * sizeof(char), SEEK_SET);
+		write(fd, &chtemp, sizeof(chtemp));
+		
+		char tmplst[] = "\nYour cargo has been successfully removed on the server.\n";
+		write(clientFd, tmplst, strlen(tmplst) + 1);
 	} else if (recvmsg[0] == '2') { // modify
+		memset(str, 0, sizeof(str));
+		strcat(str, "\nType your new cargo's name. It will be saved on the server.\nYour input >> ");
+		write(clientFd, str, strlen(str) + 1);
+		
+		readLine(clientFd, recvmsg);
+		for (int i = 0; i < strlen(recvmsg); i++) { // removing '\n'
+			if (recvmsg[i] == '\n') {
+				recvmsg[i] = 0;
+				break;
+			}
+		}
+		
+		memset(record.name, 0, sizeof(record.name));
+		strcpy(record.name, recvmsg);
+		lseek(recordFd, (long)(inum - 1) * sizeof(record), SEEK_SET);
+		write(recordFd, &record, sizeof(record));
+		
+		char tmplst[] = "\nYour cargo has been successfully changed.\n";
+		write(clientFd, tmplst, strlen(tmplst) + 1);
 	} else if (recvmsg[0] == '3') { // change passwd
+		memset(str, 0, sizeof(str));
+		strcat(str, "\nType new password for your locker.\nYour input >> ");
+		write(clientFd, str, strlen(str) + 1);
+		
+		readLine(clientFd, recvmsg);
+		for (int i = 0; i < strlen(recvmsg); i++) { // removing '\n'
+			if (recvmsg[i] == '\n') {
+				recvmsg[i] = 0;
+				break;
+			}
+		}
+		
+		char recvmsg2[MAXSUBLINE];
+		memset(str, 0, sizeof(str));
+		strcat(str, "\nPlease type your password one more time.\nYour input >> ");
+		write(clientFd, str, strlen(str) + 1);
+		
+		readLine(clientFd, recvmsg2);
+		for (int i = 0; i < strlen(recvmsg2); i++) { // removing '\n'
+			if (recvmsg2[i] == '\n') {
+				recvmsg2[i] = 0;
+				break;
+			}
+		}
+		
+		flag = 1;
+		for (int i = 0; i < 100; i++) {
+			if (recvmsg[i] != recvmsg2[i]) { flag = 0; break; }
+			if (recvmsg[i] == 0 && recvmsg2[i] == 0) break;
+		}
+		
+		memset(str, 0, sizeof(str));
+		if (flag) {
+			strcat(str, "\nYour cargo is completly stored!\n\n");
+			write(clientFd, str, strlen(str) + 1);
+		} else {
+			strcat(str, "\nYou typed wrong password. Please try again later.\n\n");
+			write(clientFd, str, strlen(str) + 1);
+			
+			free(lockerstatus);
+			close(fd);
+			close(recordFd);
+			return;
+		}
+		
+		memset(record.passwd, 0, sizeof(record.passwd));
+		strcpy(record.passwd, recvmsg);
+		
+		lseek(recordFd, (long)(inum - 1) * sizeof(record), SEEK_SET);
+		write(recordFd, &record, sizeof(record));
+		
 	} else if (recvmsg[0] == '4') { // exit
+		char tmplst[] = "\nNothing changed.\n";
+		write(clientFd, tmplst, strlen(tmplst) + 1);
 	} else { // error
+		char tmplst[] = "\nInput error, nothing changed.\n";
+		write(clientFd, tmplst, strlen(tmplst) + 1);
 	}
+	
+	free(lockerstatus);
+	close(fd);
+	close(recordFd);
 }
 
 void client_manage(const int clientFd)
@@ -180,6 +271,44 @@ void client_manage(const int clientFd)
 	memset(sendmsg, 0, sizeof(sendmsg));
 	fgets(sendmsg, MAXSUBLINE, stdin);
 	write(clientFd, sendmsg, strlen(sendmsg) + 1);
+	
+	if (sendmsg[0] == '1') { // remove
+		readLine(clientFd, str);
+		printf("%s", str);
+	} else if (sendmsg[0] == '2') { // modify
+		readLine(clientFd, str);
+		printf("%s", str);
+		
+		memset(sendmsg, 0, sizeof(sendmsg));
+		fgets(sendmsg, MAXSUBLINE, stdin);
+		write(clientFd, sendmsg, strlen(sendmsg) + 1);
+		
+		readLine(clientFd, str);
+		printf("%s", str);
+	} else if (sendmsg[0] == '3') { // change password
+		readLine(clientFd, str);
+		printf("%s", str);
+		
+		memset(sendmsg, 0, sizeof(sendmsg)); // password input
+		fgets(sendmsg, MAXSUBLINE, stdin);
+		write(clientFd, sendmsg, strlen(sendmsg) + 1);
+		
+		readLine(clientFd, str);
+		printf("%s", str);
+		
+		memset(sendmsg, 0, sizeof(sendmsg)); // again password input
+		fgets(sendmsg, MAXSUBLINE, stdin);
+		write(clientFd, sendmsg, strlen(sendmsg) + 1);
+		
+		readLine(clientFd, str);
+		printf("%s", str);
+	} else if (sendmsg[0] == '4') { // exit
+		readLine(clientFd, str);
+		printf("%s", str);
+	} else { // error
+		readLine(clientFd, str);
+		printf("%s", str);
+	}
 	
 	
 	printf("Return to menu...\n\n");

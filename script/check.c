@@ -8,7 +8,7 @@ void check(const int clientFd, const int lockerlen)
 	fd = open("../resource/status", O_RDONLY);
 	lseek(fd, 0, SEEK_SET);
 	
-	strcat(str, "\n** LOCKER STATUS **\n");
+	strcat(str, "\n\n** LOCKER STATUS **\n");
 	for (int i = 0; i < lockerlen; i++) {
 		strcat(str, "LOCKER ");
 		sprintf(num, "%d", i + 1);

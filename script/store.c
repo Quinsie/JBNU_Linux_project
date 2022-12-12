@@ -11,7 +11,7 @@ void store(const int clientFd, const int lockerlen)
 	lseek(fd, 0, SEEK_SET);
 	voidlocker = (int*)calloc(lockerlen, sizeof(int));
 	
-	strcat(str, "\n** STORE CARGO **\n");
+	strcat(str, "\n\n** STORE CARGO **\n");
 	strcat(str, "You can store your cargo on this server.\n\nVOID lockers are here : ");
 	
 	for (int i = 0; i < lockerlen; i++) {
