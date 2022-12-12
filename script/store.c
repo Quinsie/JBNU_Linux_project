@@ -1,5 +1,6 @@
 #include "store.h"
 
+// server part
 void store(const int clientFd, const int lockerlen)
 {
 	char str[MAXLINE] = "", num[5], chtemp, recvmsg[MAXSUBLINE];
@@ -125,6 +126,7 @@ void store(const int clientFd, const int lockerlen)
 	close(recordFd);
 }
 
+// client part
 void client_store(const int clientFd)
 {
 	char str[MAXLINE], sendmsg[MAXSUBLINE];
