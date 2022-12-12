@@ -7,6 +7,7 @@ void store(const int clientFd, const int lockerlen)
 	int inum, fd, flag, recordFd;
 	int* voidlocker;
 	struct locker record;
+	struct flock lock;
 	
 	fd = open("../resource/status", O_RDWR);
 	lseek(fd, 0, SEEK_SET);
@@ -53,6 +54,17 @@ void store(const int clientFd, const int lockerlen)
 			break;
 		}
 	}
+	
+	// lock
+	recordFd = open("../resource/record", O_RDWR);
+	
+	lock.l_type = F_WRLCK;
+	lock.l_whence = SEEK_SET;
+	lock.l_start = (inum - 1) * sizeof(record);
+	lock.l_len = sizeof(record);
+	fcntl(recordFd, F_SETLKW, &lock);
+	
+	lseek(recordFd, (long)(inum - 1) * sizeof(record), SEEK_SET);
 	
 	// cargo name
 	memset(str, 0, sizeof(str));
@@ -108,18 +120,23 @@ void store(const int clientFd, const int lockerlen)
 	} else {
 		strcat(str, "\nYou typed wrong password. Please try again later.\n\n");
 		write(clientFd, str, strlen(str) + 1);
+		lock.l_type = F_UNLCK;
+		fcntl(recordFd, F_SETLK, &lock);
 		free(voidlocker);
 		close(fd);
+		close(recordFd);
 		return;
 	}
 	
-	recordFd = open("../resource/record", O_RDWR);
-	lseek(recordFd, (long)(inum - 1) * sizeof(record), SEEK_SET);
 	write(recordFd, &record, sizeof(record));
 	
 	chtemp = '1';
 	lseek(fd, (long)(inum - 1) * sizeof(chtemp), SEEK_SET);
 	write(fd, &chtemp, sizeof(chtemp));
+	
+	// unlock
+	lock.l_type = F_UNLCK;
+	fcntl(recordFd, F_SETLK, &lock);
 	
 	free(voidlocker);
 	close(fd);

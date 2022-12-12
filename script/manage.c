@@ -6,6 +6,7 @@ void manage(const int clientFd, const int lockerlen)
 	int inum, fd, recordFd, flag, repeat, flag2;
 	int* lockerstatus;
 	struct locker record;
+	struct flock lock;
 	
 	fd = open("../resource/status", O_RDWR); // lockerstatus file descriptor (option = read ans write)
 	lseek(fd, 0, SEEK_SET);
@@ -50,6 +51,13 @@ void manage(const int clientFd, const int lockerlen)
 	
 	// get locker data from record
 	recordFd = open("../resource/record", O_RDWR);
+	
+	lock.l_type = F_WRLCK;
+	lock.l_whence = SEEK_SET;
+	lock.l_start = (inum - 1) * sizeof(record);
+	lock.l_len = sizeof(record);
+	fcntl(recordFd, F_SETLKW, &lock);
+	
 	lseek(recordFd, (long)(inum - 1) * sizeof(record), SEEK_SET);
 	read(recordFd, &record, sizeof(record));
 	
@@ -89,6 +97,8 @@ void manage(const int clientFd, const int lockerlen)
 	if (!flag2) { // wrong 3 times
 		strcat(str, "\nYou have typed wrong answer 3 times. Access denied.\n");
 		write(clientFd, str, strlen(str) + 1);
+		lock.l_type = F_UNLCK;
+		fcntl(recordFd, F_SETLK, &lock);
 		free(lockerstatus);
 		close(fd);
 		close(recordFd);
@@ -182,6 +192,8 @@ void manage(const int clientFd, const int lockerlen)
 			strcat(str, "\nYou typed wrong password. Please try again later.\n\n");
 			write(clientFd, str, strlen(str) + 1);
 			
+			lock.l_type = F_UNLCK;
+			fcntl(recordFd, F_SETLK, &lock);
 			free(lockerstatus);
 			close(fd);
 			close(recordFd);
@@ -202,6 +214,8 @@ void manage(const int clientFd, const int lockerlen)
 		write(clientFd, tmplst, strlen(tmplst) + 1);
 	}
 	
+	lock.l_type = F_UNLCK;
+	fcntl(recordFd, F_SETLK, &lock);
 	free(lockerstatus);
 	close(fd);
 	close(recordFd);
