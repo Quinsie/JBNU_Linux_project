@@ -1,0 +1,5 @@
+USAGE
+server compile = gcc -o ../exec/server server.c check.c manage.c management.c readline.c store.c
+client compile = gcc -o ../exec/client client.c check.c client_management.c manage.c readline.c store.c
+
+detail info in README.md
