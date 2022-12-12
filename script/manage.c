@@ -12,7 +12,6 @@ void manage(const int clientFd, const int lockerlen)
 	lockerstatus = (int*)calloc(lockerlen, sizeof(int));
 	
 	for (int i = 0; i < lockerlen; i++) {
-		sprintf(num, "%d", i + 1);
 		read(fd, &chtemp, sizeof(chtemp));
 		if (chtemp == '1') lockerstatus[i] = 1;
 	}
@@ -96,8 +95,24 @@ void manage(const int clientFd, const int lockerlen)
 		return;
 	} 
 	
+	// give locker info and get order
+	sprintf(num, "%d", inum);
+	strcat(str, "\n** Locker ");
+	strcat(str, num);
+	strcat(str, " info **\nCargo name = ");
+	strcat(str, record.name);
+	strcat(str, "\nLocker password = ");
+	strcat(str, record.passwd);
+	strcat(str, "\n\nTake cargo : 1\nModify cargo : 2\nChange password : 3\nExit : 4\nYour input >> ");
+	write(clientFd, str, strlen(str) + 1);
 	
-	
+	readLine(clientFd, recvmsg);
+	if (recvmsg[0] == '1') { // take
+	} else if (recvmsg[0] == '2') { // modify
+	} else if (recvmsg[0] == '3') { // change passwd
+	} else if (recvmsg[0] == '4') { // exit
+	} else { // error
+	}
 }
 
 void client_manage(const int clientFd)
@@ -158,6 +173,13 @@ void client_manage(const int clientFd)
 		sleep(1);
 		return;
 	}
+	
+	// get locker info and give order
+	readLine(clientFd, str);
+	printf("%s", str);
+	memset(sendmsg, 0, sizeof(sendmsg));
+	fgets(sendmsg, MAXSUBLINE, stdin);
+	write(clientFd, sendmsg, strlen(sendmsg) + 1);
 	
 	
 	printf("Return to menu...\n\n");
